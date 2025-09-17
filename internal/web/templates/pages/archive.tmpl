@@ -1,0 +1,17 @@
+{{ define "pages/archive.tmpl" }}
+  {{ template "partials/header" . }}
+  <div class="archive">
+    {{ range .Groups }}
+      <h2>{{ .Year }}</h2>
+      <ul>
+        {{ range .Items }}
+        <li>
+          <span class="post_date">{{ .Date }}</span>
+          <a class="post_title" href="/post/{{ .Slug }}">{{ .Title }}</a>
+        </li>
+        {{ end }}
+      </ul>
+    {{ end }}
+  </div>
+  {{ template "partials/footer" . }}
+{{ end }}

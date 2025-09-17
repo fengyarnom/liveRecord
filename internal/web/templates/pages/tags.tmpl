@@ -1,0 +1,15 @@
+{{ define "pages/tags.tmpl" }}
+  {{ template "partials/header" . }}
+  <div class="tags-area">
+    <div class="header"><span>全部标签</span></div>
+    <div class="tags">
+      {{ range .Tags }}
+      <div class="tag">
+        <a href="/tag/{{ .Slug }}">{{ .Name }}</a>
+        <span class="terms_count">{{ .Count }}</span>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ template "partials/footer" . }}
+{{ end }}

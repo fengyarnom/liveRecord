@@ -1,0 +1,25 @@
+{{ define "partials/header" }}
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .SiteTitle }}</title>
+  <meta name="description" content="{{ .Description }}">
+  {{ if .Canonical }}<link rel="canonical" href="{{ .Canonical }}">{{ end }}
+  <meta property="og:title" content="{{ .Title }}">
+  <meta property="og:description" content="{{ .Description }}">
+  {{ if .Canonical }}<meta property="og:url" content="{{ .Canonical }}">{{ end }}
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/static/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="brand">{{ .SiteTitle }}</a>
+    <nav class="nav">
+      <a href="/">首页</a>
+      <a href="/archive">归档</a>
+    </nav>
+  </header>
+  <main class="container">
+{{ end }}

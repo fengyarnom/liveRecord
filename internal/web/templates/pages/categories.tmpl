@@ -1,0 +1,15 @@
+{{ define "pages/categories.tmpl" }}
+  {{ template "partials/header" . }}
+  <div class="categories-area">
+    <div class="header"><span>全部分类</span></div>
+    <div class="categories">
+      {{ range .Categories }}
+      <div class="category">
+        <a href="/category/{{ .Slug }}">{{ .Name }}</a>
+        <span class="terms_count">{{ .Count }}</span>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ template "partials/footer" . }}
+{{ end }}

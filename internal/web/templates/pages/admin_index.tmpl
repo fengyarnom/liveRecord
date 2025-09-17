@@ -1,0 +1,8 @@
+{{ define "pages/admin_index.tmpl" }}
+  {{ template "partials/header" . }}
+  <h1>管理后台</h1>
+  <form method="post" action="/admin/logout">
+    <button type="submit">注销</button>
+  </form>
+  {{ template "partials/footer" . }}
+{{ end }}

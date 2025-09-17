@@ -1,0 +1,11 @@
+server:
+  port: "8080"
+  gin_mode: "release"
+database:
+  url: ""
+site:
+  title: "liveRecord"
+  base_url: "http://localhost:8080"
+  description: "description"
+security:
+  session_secret: "change-me-please-32bytes-min"
