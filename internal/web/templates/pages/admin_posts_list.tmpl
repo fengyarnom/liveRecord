@@ -1,7 +1,11 @@
 {{ define "pages/admin_posts_list.tmpl" }}
   {{ template "partials/header" . }}
   <h1>文章管理</h1>
-  <p><a href="/admin/posts/new">新建文章</a></p>
+  <p>
+    <a href="/admin">返回后台</a>
+    · <a href="/admin/posts/new">新建文章</a>
+    · <a href="/">查看站点</a>
+  </p>
   <table>
     <thead>
       <tr><th>ID</th><th>标题</th><th>Slug</th><th>发布时间</th><th>操作</th></tr>

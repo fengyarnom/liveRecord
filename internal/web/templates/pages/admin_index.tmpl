@@ -1,6 +1,11 @@
 {{ define "pages/admin_index.tmpl" }}
   {{ template "partials/header" . }}
   <h1>管理后台</h1>
+  <p>
+    <a href="/admin/posts">文章列表</a>
+    · <a href="/admin/posts/new">新建文章</a>
+    · <a href="/">返回前台</a>
+  </p>
   <form method="post" action="/admin/logout">
     <button type="submit">注销</button>
   </form>
