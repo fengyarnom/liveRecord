@@ -1,0 +1,10 @@
+{{ define "pages/post.tmpl" }}
+  {{ template "partials/header" . }}
+  <article class="post">
+    <h1 class="post-title">{{ .Post.Title }}</h1>
+    <div class="post-meta">{{ .Post.PublishedAt.Format "2006-01-02 15:04" }}</div>
+    <div class="post-content">{{ .Content }}</div>
+    <p class="post-back"><a href="/">← 返回首页</a></p>
+  </article>
+  {{ template "partials/footer" . }}
+{{ end }}

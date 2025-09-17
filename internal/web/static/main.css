@@ -1,0 +1,13 @@
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.6; }
+.site-header, .site-footer { padding: 12px 16px; border-bottom: 1px solid #ddd; }
+.site-footer { border-top: 1px solid #ddd; border-bottom: none; text-align: center; color: #666; }
+.container { max-width: 820px; margin: 24px auto; padding: 0 16px; }
+.brand { font-weight: 700; margin-right: 12px; text-decoration: none; }
+.nav a { margin-right: 12px; text-decoration: none; color: inherit; }
+.post-list { list-style: none; padding: 0; margin: 0; }
+.post-item { padding: 12px 0; border-bottom: 1px solid #eee; }
+.post-title { font-size: 1.1rem; font-weight: 600; text-decoration: none; }
+.post-date { margin-left: 8px; color: #888; font-size: .9rem; }
+.post-summary { margin: 6px 0 0; color: #444; }
