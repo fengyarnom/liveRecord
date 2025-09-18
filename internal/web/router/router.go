@@ -112,7 +112,8 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 				continue
 			}
 			cat, _ := rp.CategoryByPostID(c, p.ID)
-			items = append(items, item{Title: p.Title, Slug: p.Slug, Date: p.PublishedAt.Format("2006-01-02"), HTML: template.HTML(buf.String()), Category: cat})
+			htmlStr := addLazyToImages(buf.String())
+			items = append(items, item{Title: p.Title, Slug: p.Slug, Date: p.PublishedAt.Format("2006-01-02"), HTML: template.HTML(htmlStr), Category: cat})
 		}
 		c.HTML(http.StatusOK, "pages/index.tmpl", gin.H{
 			"Title":       cfg.Site.Title,
@@ -153,7 +154,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			"Description": desc,
 			"Canonical":   seo.CanonicalURL(cfg.Site.BaseURL, c.Request.URL),
 			"Post":        p,
-			"Content":     template.HTML(buf.String()),
+			"Content":     template.HTML(addLazyToImages(buf.String())),
 			"Tags":        tags,
 			"Category":    cat,
 		})
