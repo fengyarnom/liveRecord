@@ -127,8 +127,9 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 
 	// md initialized above for homepage and post rendering
 
-	r.GET("/post/:slug", func(c *gin.Context) {
-		p, err := rp.FindBySlug(c, c.Param("slug"))
+	r.GET("/post/*slug", func(c *gin.Context) {
+		slugPath := strings.Trim(c.Param("slug"), "/")
+		p, err := rp.FindBySlug(c, slugPath)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "query failed")
 			return
@@ -366,12 +367,15 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 
 	r.GET("/admin/posts/new", auth, func(c *gin.Context) {
 		token := security.EnsureCSRFCookie(c.Writer, c.Request)
+		cats, _ := rp.CategoriesWithCount(c)
 		c.HTML(http.StatusOK, "pages/admin_post_form.tmpl", gin.H{
-			"Title":     "新建文章",
-			"SiteTitle": cfg.Site.Title,
-			"CSRFToken": token,
-			"Action":    "/admin/posts",
-			"Post":      repo.Post{},
+			"Title":      "新建文章",
+			"SiteTitle":  cfg.Site.Title,
+			"CSRFToken":  token,
+			"Action":     "/admin/posts",
+			"Post":       repo.Post{},
+			"Categories": cats,
+			"TagsCSV":    "",
 		})
 	})
 
@@ -383,20 +387,28 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		_ = c.Request.ParseForm()
 		var p repo.Post
 		p.Title = c.PostForm("title")
-		p.Slug = c.PostForm("slug")
+		// Ignore provided slug; we derive from published_at
+		p.Slug = ""
 		p.Summary = c.PostForm("summary")
 		p.ContentMD = c.PostForm("content_md")
 		status := c.PostForm("status")
+		catSlug := strings.TrimSpace(c.PostForm("category"))
+		if catSlug != "" {
+			if cid, err := rp.CategoryIDBySlug(c, catSlug); err == nil {
+				p.CategoryID = cid
+			}
+		}
 		if v := c.PostForm("published_at"); v != "" {
 			if t, err := time.Parse("2006-01-02 15:04", v); err == nil {
 				p.PublishedAt = t
 			}
 		}
-		// slug normalize + unique
-		base := slug.Normalize(p.Slug)
-		if base == "" {
-			base = slug.Normalize(p.Title)
+		// Default published_at to current time if empty
+		if p.PublishedAt.IsZero() {
+			p.PublishedAt = time.Now()
 		}
+		// slug: derive from published_at and ensure unique
+		base := slug.FromTime(p.PublishedAt)
 		u, err := rp.EnsureUniqueSlug(c, base)
 		if err != nil {
 			c.String(http.StatusBadRequest, "slug")
@@ -407,6 +419,11 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		if err != nil {
 			c.String(http.StatusBadRequest, "save failed")
 			return
+		}
+		// update tags
+		if tagsStr := c.PostForm("tags"); tagsStr != "" {
+			parts := strings.Split(tagsStr, ",")
+			_ = rp.UpdatePostTags(c, id, parts)
 		}
 		c.Redirect(http.StatusFound, "/admin/posts/"+strconv.FormatInt(id, 10)+"/edit")
 	})
@@ -423,12 +440,29 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			c.String(http.StatusNotFound, "not found")
 			return
 		}
+		cats, _ := rp.CategoriesWithCount(c)
+		tagList, _ := rp.TagsByPostID(c, id)
+		var tagsCSV strings.Builder
+		for i, t := range tagList {
+			if i > 0 {
+				tagsCSV.WriteString(", ")
+			}
+			tagsCSV.WriteString(t.Name)
+		}
 		c.HTML(http.StatusOK, "pages/admin_post_form.tmpl", gin.H{
-			"Title":     "编辑文章",
-			"SiteTitle": cfg.Site.Title,
-			"CSRFToken": token,
-			"Action":    "/admin/posts/" + c.Param("id"),
-			"Post":      p,
+			"Title":      "编辑文章",
+			"SiteTitle":  cfg.Site.Title,
+			"CSRFToken":  token,
+			"Action":     "/admin/posts/" + c.Param("id"),
+			"Post":       p,
+			"Categories": cats,
+			"TagsCSV":    tagsCSV.String(),
+			"SelectedCategory": func() string {
+				if cat, _ := rp.CategoryByPostID(c, id); cat != nil {
+					return cat.Slug
+				}
+				return ""
+			}(),
 		})
 	})
 
@@ -443,22 +477,33 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		p.ID = id
 		p.Title = c.PostForm("title")
 		p.Slug = slug.Normalize(c.PostForm("slug"))
-		if p.Slug == "" {
-			p.Slug = slug.Normalize(p.Title)
-		}
 		p.Summary = c.PostForm("summary")
 		p.ContentMD = c.PostForm("content_md")
 		status := c.PostForm("status")
+		catSlug := strings.TrimSpace(c.PostForm("category"))
+		if cid, err := rp.CategoryIDBySlug(c, catSlug); err == nil {
+			p.CategoryID = cid
+		}
 		p.PublishedAt = time.Time{}
 		if v := c.PostForm("published_at"); v != "" {
 			if t, err := time.Parse("2006-01-02 15:04", v); err == nil {
 				p.PublishedAt = t
 			}
 		}
+		// If slug left empty during edit, fall back to time-based slug (using published_at or now)
+		if p.Slug == "" {
+			p.Slug = slug.FromTime(p.PublishedAt)
+		}
 		if err := rp.AdminUpdatePost(c, &p, status); err != nil {
 			c.String(http.StatusBadRequest, "update failed")
 			return
 		}
+		// replace tags
+		parts := []string{}
+		if tagsStr := c.PostForm("tags"); tagsStr != "" {
+			parts = strings.Split(tagsStr, ",")
+		}
+		_ = rp.UpdatePostTags(c, id, parts)
 		c.Redirect(http.StatusFound, "/admin/posts")
 	})
 
@@ -502,7 +547,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			sb.WriteString("<title>")
 			sb.WriteString(seo.XMLEscape(it.Title))
 			sb.WriteString("</title>")
-			link := strings.TrimRight(base, "/") + "/post/" + it.Slug
+			link := strings.TrimRight(base, "/") + "/post/" + it.Slug + "/"
 			sb.WriteString("<link>")
 			sb.WriteString(seo.XMLEscape(link))
 			sb.WriteString("</link>")
@@ -537,7 +582,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		sb.WriteString("</loc><changefreq>daily</changefreq><priority>0.8</priority></url>")
 		for _, p := range posts {
 			sb.WriteString("<url><loc>")
-			sb.WriteString(seo.XMLEscape(base + "/post/" + p.Slug))
+			sb.WriteString(seo.XMLEscape(base + "/post/" + p.Slug + "/"))
 			sb.WriteString("</loc>")
 			if !p.PublishedAt.IsZero() {
 				sb.WriteString("<lastmod>")

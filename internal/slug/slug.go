@@ -3,6 +3,7 @@ package slug
 import (
 	pinyin "github.com/mozillazg/go-pinyin"
 	"strings"
+	"time"
 )
 
 func Normalize(s string) string {
@@ -39,4 +40,14 @@ func Normalize(s string) string {
 	}
 	out = strings.Trim(out, "-")
 	return out
+}
+
+// FromTime generates a time-based slug using local time.
+// Format: YYYYMMDD-HHMM (e.g., 20250130-0915)
+func FromTime(t time.Time) string {
+	if t.IsZero() {
+		t = time.Now()
+	}
+	// Directory-style slug: YYYY/MM/DD/HHMM
+	return t.In(time.Local).Format("2006/01/02/1504")
 }

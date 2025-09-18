@@ -203,7 +203,7 @@ hr:before{
 
 /* admin login */
 .auth-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;}
-.card{width:100%;max-width:420px;background:#fff;border:1px solid #eee;border-radius:8px;padding:20px;box-shadow: 0 0px 4px rgba(0, 0, 0, .06);}
+.card{width:100%;max-width:420px;background:#fff;border:1px solid #eee;border-radius:8px;padding:20px;box-shadow: 0 0px 4px rgba(0, 0, 0, .06);box-sizing:border-box;}
 .card-title{margin:0 0 12px;font-size:1.35rem;}
 .form{margin-top:8px;}
 .form-group{display:flex;flex-direction:column;margin-bottom:12px;}
@@ -350,17 +350,24 @@ hr:before{
 /* Compact buttons inside tables */
 .btn-sm{padding:6px 10px;font-size:.92rem;border-radius:6px;}
 
+/* Paginator (shared) */
+.paginator{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0;}
+.paginator a{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:#3d3d3f;text-decoration:none;}
+.paginator a:hover{background:#f4f4f4;}
+.paginator .page-number{color:#667085;padding:0 6px;}
+
 /* Form controls (reuse login styles) */
 .form{margin-top:8px;}
 .form-group{display:flex;flex-direction:column;margin-bottom:12px;}
 .form-group label{font-size:.9rem;color:#444;margin-bottom:6px;}
 .form-group input,.form-group textarea,.form-group select{border:1px solid #ddd;border-radius:6px;padding:10px 12px;font-size:1rem;outline:none;background:#fafafa;width:100%;}
+.form-group input,.form-group textarea,.form-group select{box-sizing:border-box;max-width:100%;}
 .form-group textarea{resize:vertical;}
 .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#3c546c;background:#fff;box-shadow:0 0 0 3px rgba(60,84,108,.15);}
 .form-actions{display:flex;gap:10px;margin-top:12px;}
 
 /* Card variant for wide forms */
-.admin-card{width:100%;max-width:none}
+.admin-card{width:100%;max-width:none;box-sizing:border-box;}
 
 .articles .post-list .post-item{
     list-style-type: none;
@@ -463,6 +470,11 @@ a:focus-visible{ outline:2px solid #3c546c; outline-offset:2px; }
     p img{ margin: 1.25em 0; }
     /* Center actions in narrow tables */
     .table tbody td.actions{ justify-content:center; }
+    /* Admin header and tabs center on mobile */
+    .admin-header{ justify-content:center; }
+    .admin-header .tabs{ width:100%; justify-content:center; }
+    .admin-table-wrap{ max-width:100%; }
+    .table thead th, .table tbody td{ padding:10px 12px; font-size:.95rem; }
 }
 
 /* Text selection styling (cross-browser) */

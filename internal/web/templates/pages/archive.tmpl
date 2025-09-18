@@ -6,7 +6,7 @@
         {{ range .Items }}
         <li>
           <span class="post_date">{{ .Date }}</span>
-          <a class="post_title" href="/post/{{ .Slug }}">{{ .Title }}</a>
+          <a class="post_title" href="/post/{{ .Slug }}/">{{ .Title }}</a>
         </li>
         {{ end }}
       </ul>
