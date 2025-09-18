@@ -200,6 +200,23 @@ hr:before{
     text-align: center;
 }
 
+/* admin login */
+.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;}
+.card{width:100%;max-width:420px;background:#fff;border:1px solid #eee;border-radius:8px;padding:20px;box-shadow: 0 0px 4px rgba(0, 0, 0, .06);}
+.card-title{margin:0 0 12px;font-size:1.35rem;}
+.form{margin-top:8px;}
+.form-group{display:flex;flex-direction:column;margin-bottom:12px;}
+.form-group label{font-size:.9rem;color:#444;margin-bottom:6px;}
+.form-group input{border:1px solid #ddd;border-radius:6px;padding:10px 12px;font-size:1rem;outline:none;background:#fafafa;}
+.form-group input:focus{border-color:#3c546c;background:#fff;box-shadow:0 0 0 3px rgba(60,84,108,.15);}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:1px solid transparent;border-radius:6px;cursor:pointer;text-decoration:none;font-weight:600;}
+.btn-block{width:100%;}
+.btn-primary{background:#3c546c;color:#fff;}
+.btn-primary:hover{background:#2f4357;}
+.muted{color:#667085;}
+.text-center{text-align:center;}
+.small-gap{margin-top:10px;}
+
 .archive h2{
     text-align: center;
 }
