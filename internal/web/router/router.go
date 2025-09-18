@@ -67,6 +67,12 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 
 	rp := repo.New(db)
 
+	md := goldmark.New(
+		goldmark.WithRendererOptions(html.WithHardWraps(), html.WithXHTML(), html.WithUnsafe()),
+		goldmark.WithExtensions(extension.GFM, extension.Linkify),
+		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+	)
+
 	r.GET("/healthz", func(c *gin.Context) {
 		if err := db.PingContext(c); err != nil {
 			c.String(http.StatusServiceUnavailable, "db: %v", err)
@@ -77,7 +83,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 
 	r.GET("/", func(c *gin.Context) {
 		page := parsePage(c)
-		size := 10
+		size := 5
 		total, err := rp.CountPublished(c)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "query failed")
@@ -87,26 +93,38 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		if page > maxPage {
 			page = maxPage
 		}
-		posts, err := rp.LatestPublishedPage(c, size, (page-1)*size)
+		posts, err := rp.LatestPublishedWithContentPage(c, size, (page-1)*size)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "query failed")
 			return
+		}
+		type item struct {
+			Title    string
+			Slug     string
+			Date     string
+			HTML     template.HTML
+			Category *repo.Category
+		}
+		items := make([]item, 0, len(posts))
+		for _, p := range posts {
+			var buf bytes.Buffer
+			if err := md.Convert([]byte(p.ContentMD), &buf); err != nil {
+				continue
+			}
+			cat, _ := rp.CategoryByPostID(c, p.ID)
+			items = append(items, item{Title: p.Title, Slug: p.Slug, Date: p.PublishedAt.Format("2006-01-02"), HTML: template.HTML(buf.String()), Category: cat})
 		}
 		c.HTML(http.StatusOK, "pages/index.tmpl", gin.H{
 			"Title":       cfg.Site.Title,
 			"SiteTitle":   cfg.Site.Title,
 			"Description": cfg.Site.Description,
 			"Canonical":   seo.CanonicalURL(cfg.Site.BaseURL, c.Request.URL),
-			"Posts":       posts,
+			"Items":       items,
 			"Pager":       buildPager(c, page, maxPage),
 		})
 	})
 
-	md := goldmark.New(
-		goldmark.WithRendererOptions(html.WithHardWraps(), html.WithXHTML(), html.WithUnsafe()),
-		goldmark.WithExtensions(extension.GFM, extension.Linkify),
-		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
-	)
+	// md initialized above for homepage and post rendering
 
 	r.GET("/post/:slug", func(c *gin.Context) {
 		p, err := rp.FindBySlug(c, c.Param("slug"))
@@ -127,6 +145,8 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 		if desc == "" {
 			desc = cfg.Site.Description
 		}
+		tags, _ := rp.TagsByPostID(c, p.ID)
+		cat, _ := rp.CategoryByPostID(c, p.ID)
 		c.HTML(http.StatusOK, "pages/post.tmpl", gin.H{
 			"Title":       p.Title,
 			"SiteTitle":   cfg.Site.Title,
@@ -134,6 +154,8 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			"Canonical":   seo.CanonicalURL(cfg.Site.BaseURL, c.Request.URL),
 			"Post":        p,
 			"Content":     template.HTML(buf.String()),
+			"Tags":        tags,
+			"Category":    cat,
 		})
 	})
 

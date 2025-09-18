@@ -97,6 +97,29 @@ func (r *Repo) LatestPublishedPage(ctx context.Context, limit, offset int) ([]Po
 	return out, rows.Err()
 }
 
+func (r *Repo) LatestPublishedWithContentPage(ctx context.Context, limit, offset int) ([]Post, error) {
+	rows, err := r.DB.QueryContext(ctx, `
+        SELECT id, title, slug, COALESCE(summary, ''), COALESCE(content_md,''), published_at
+        FROM posts
+        WHERE status='published' AND published_at <= now()
+        ORDER BY published_at DESC
+        LIMIT $1 OFFSET $2
+    `, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []Post
+	for rows.Next() {
+		var p Post
+		if err := rows.Scan(&p.ID, &p.Title, &p.Slug, &p.Summary, &p.ContentMD, &p.PublishedAt); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
 func (r *Repo) FindBySlug(ctx context.Context, slug string) (*Post, error) {
 	row := r.DB.QueryRowContext(ctx, `
         SELECT id, title, slug, COALESCE(summary,''), COALESCE(content_md,''), published_at

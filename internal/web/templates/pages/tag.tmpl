@@ -1,13 +1,12 @@
 {{ define "pages/tag.tmpl" }}
   {{ template "partials/header" . }}
   <div class="articles">
-    <h1>标签：{{ .Tag.Name }}</h1>
     <ul class="post-list">
       {{ range .Posts }}
       <li class="post-item">
-        <a class="post-title" href="/post/{{ .Slug }}">{{ .Title }}</a>
         <span class="post-date">{{ .PublishedAt.Format "2006-01-02" }}</span>
-        {{ if .Summary }}<p class="post-summary">{{ .Summary }}</p>{{ end }}
+        <a class="post-title" href="/post/{{ .Slug }}">{{ .Title }}</a>
+
       </li>
       {{ else }}
       <li>该标签暂无文章</li>

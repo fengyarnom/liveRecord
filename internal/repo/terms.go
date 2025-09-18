@@ -145,3 +145,41 @@ func (r *Repo) TagPostsPage(ctx context.Context, slug string, limit, offset int)
 	}
 	return posts, rows.Err()
 }
+
+func (r *Repo) CategoryByPostID(ctx context.Context, postID int64) (*Category, error) {
+	row := r.DB.QueryRowContext(ctx, `
+        SELECT c.id, c.name, c.slug
+        FROM posts p LEFT JOIN categories c ON p.category_id=c.id
+        WHERE p.id=$1`, postID)
+	var c Category
+	if err := row.Scan(&c.ID, &c.Name, &c.Slug); err != nil {
+		// if category_id is null, row.Scan returns sql.ErrNoRows; return nil
+		return nil, nil
+	}
+	if c.ID == 0 {
+		return nil, nil
+	}
+	return &c, nil
+}
+
+func (r *Repo) TagsByPostID(ctx context.Context, postID int64) ([]Tag, error) {
+	rows, err := r.DB.QueryContext(ctx, `
+        SELECT t.id, t.name, t.slug
+        FROM tags t
+        JOIN post_tags pt ON pt.tag_id=t.id
+        WHERE pt.post_id=$1
+        ORDER BY t.name`, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []Tag
+	for rows.Next() {
+		var t Tag
+		if err := rows.Scan(&t.ID, &t.Name, &t.Slug); err != nil {
+			return nil, err
+		}
+		out = append(out, t)
+	}
+	return out, rows.Err()
+}
