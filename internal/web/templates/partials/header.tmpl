@@ -18,7 +18,10 @@
 <body>
   <header class="site-header">
     <a href="/" class="brand">{{ .SiteTitle }}</a>
-    <nav class="nav">
+    <button class="nav-toggle" aria-label="打开菜单" aria-expanded="false" aria-controls="site-menu">
+      <span class="icon" aria-hidden="true">☰</span>
+    </button>
+    <nav id="site-menu" class="nav">
       <a href="/">首页</a>
       <a href="/archive">归档</a>
       <a href="/categories">分类</a>

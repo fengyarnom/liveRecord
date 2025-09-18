@@ -335,7 +335,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 	})
 
 	r.GET("/admin", auth, func(c *gin.Context) {
-		c.HTML(http.StatusOK, "pages/admin_index.tmpl", gin.H{"Title": "管理后台", "SiteTitle": cfg.Site.Title})
+		c.Redirect(http.StatusFound, "/admin/posts")
 	})
 
 	r.GET("/admin/posts", auth, func(c *gin.Context) {

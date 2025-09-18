@@ -218,7 +218,7 @@ func (r *Repo) AdminListPostsPage(ctx context.Context, limit, offset int) ([]Pos
 	rows, err := r.DB.QueryContext(ctx, `
         SELECT id, title, slug, COALESCE(summary,''), COALESCE(content_md,''), COALESCE(published_at, to_timestamp(0))
         FROM posts
-        ORDER BY created_at DESC
+        ORDER BY COALESCE(published_at, to_timestamp(0)) DESC, created_at DESC
         LIMIT $1 OFFSET $2
     `, limit, offset)
 	if err != nil {
