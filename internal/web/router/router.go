@@ -65,6 +65,25 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 	r.Static("/static", "internal/web/static")
 	r.LoadHTMLGlob("internal/web/templates/**/*.tmpl")
 
+	// robots.txt
+	r.GET("/robots.txt", func(c *gin.Context) {
+		base := strings.TrimRight(cfg.Site.BaseURL, "/")
+		if base == "" {
+			base = ""
+		}
+		content := strings.Builder{}
+		content.WriteString("User-agent: *\n")
+		content.WriteString("Disallow: /admin\n")
+		if base != "" {
+			content.WriteString("Sitemap: ")
+			content.WriteString(base)
+			content.WriteString("/sitemap.xml\n")
+		} else {
+			content.WriteString("Sitemap: /sitemap.xml\n")
+		}
+		c.Data(http.StatusOK, "text/plain; charset=utf-8", []byte(content.String()))
+	})
+
 	rp := repo.New(db)
 
 	md := goldmark.New(
@@ -302,6 +321,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			"Description": cfg.Site.Description,
 			"Canonical":   seo.CanonicalURL(cfg.Site.BaseURL, c.Request.URL),
 			"CSRFToken":   token,
+			"NoIndex":     true,
 		})
 	})
 
@@ -362,6 +382,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			"Posts":     posts,
 			"Pager":     buildPager(c, page, maxPage),
 			"CSRFToken": security.EnsureCSRFCookie(c.Writer, c.Request),
+			"NoIndex":   true,
 		})
 	})
 
@@ -376,6 +397,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			"Post":       repo.Post{},
 			"Categories": cats,
 			"TagsCSV":    "",
+			"NoIndex":    true,
 		})
 	})
 
@@ -463,6 +485,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 				}
 				return ""
 			}(),
+			"NoIndex": true,
 		})
 	})
 
