@@ -13,6 +13,7 @@ import (
 	"liveRecord/internal/web/router"
 )
 
+
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
@@ -44,3 +45,4 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
