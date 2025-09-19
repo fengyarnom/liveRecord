@@ -1,8 +1,17 @@
 {{ define "pages/admin_index.tmpl" }}
   {{ template "partials/header" . }}
-  <h1>管理后台</h1>
-  <form method="post" action="/admin/logout">
-    <button type="submit">注销</button>
-  </form>
+  <div class="admin-header">
+    <div class="tabs">
+      <a class="tab active" href="/admin/posts">文章列表</a>
+      <a class="tab" href="/admin/posts/new">新建文章</a>
+    </div>
+    <form class="right" method="post" action="/admin/logout">
+      <button class="btn" type="submit">注销</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2 class="card-title">管理后台</h2>
+    <p class="muted">在这里管理你的文章内容、发布与草稿。</p>
+  </div>
   {{ template "partials/footer" . }}
 {{ end }}

@@ -1,12 +1,21 @@
 {{ define "pages/index.tmpl" }}
   {{ template "partials/header" . }}
-  <h1>最新文章</h1>
   <ul class="post-list">
-    {{ range .Posts }}
+    {{ range .Items }}
     <li class="post-item">
-      <a class="post-title" href="/post/{{ .Slug }}">{{ .Title }}</a>
-      <span class="post-date">{{ .PublishedAt.Format "2006-01-02" }}</span>
-      {{ if .Summary }}<p class="post-summary">{{ .Summary }}</p>{{ end }}
+      <div class="post-title" >
+        <a href="/post/{{ .Slug }}/">{{ .Title }}</a>
+      </div>
+      <div class="detail_post">
+        <div class="post-date">发布时间：{{ .Date }}</div>
+        {{ if .Category }}
+        <span class="categories">
+        分类:
+          <a href="/category/{{ .Category.Slug }}">{{ .Category.Name }}</a>
+        </span>
+        {{ end }}
+      </div>
+      <div class="post-content">{{ .HTML }}</div>
     </li>
     {{ else }}
     <li>暂无文章</li>
