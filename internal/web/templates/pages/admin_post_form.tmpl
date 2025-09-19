@@ -10,7 +10,6 @@
         <a class="tab" href="/admin/posts/new">新建文章</a>
       {{ end }}
     </div>
-
   </div>
   <div class="card admin-card">
     <form method="post" action="{{ .Action }}" class="form">
@@ -60,37 +59,6 @@
       </div>
     </form>
   </div>
-  <h1>{{ .Title }}</h1>
-  <form method="post" action="{{ .Action }}">
-    <input type="hidden" name="_csrf" value="{{ .CSRFToken }}">
-    <div>
-      <label>标题</label>
-      <input type="text" name="title" value="{{ .Post.Title }}" required>
-    </div>
-    <div>
-      <label>Slug</label>
-      <input type="text" name="slug" value="{{ .Post.Slug }}" placeholder="留空自动生成">
-    </div>
-    <div>
-      <label>摘要</label>
-      <textarea name="summary" rows="3">{{ .Post.Summary }}</textarea>
-    </div>
-    <div>
-      <label>内容（Markdown）</label>
-      <textarea name="content_md" rows="16">{{ .Post.ContentMD }}</textarea>
-    </div>
-    <div>
-      <label>状态</label>
-      <select name="status">
-        <option value="draft">草稿</option>
-        <option value="published">发布</option>
-      </select>
-    </div>
-    <div>
-      <label>发布时间(可选，格式 2006-01-02 15:04)</label>
-      <input type="text" name="published_at" value="{{ if not .Post.PublishedAt.IsZero }}{{ .Post.PublishedAt.Format "2006-01-02 15:04" }}{{ end }}">
-    </div>
-    <button type="submit">保存</button>
-  </form>
+
   {{ template "partials/footer" . }}
 {{ end }}
