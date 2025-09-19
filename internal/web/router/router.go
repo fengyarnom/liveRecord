@@ -135,7 +135,7 @@ func New(db *sql.DB, cfg *config.Config) *gin.Engine {
 			items = append(items, item{Title: p.Title, Slug: p.Slug, Date: p.PublishedAt.Format("2006-01-02"), HTML: template.HTML(htmlStr), Category: cat})
 		}
 		c.HTML(http.StatusOK, "pages/index.tmpl", gin.H{
-			"Title":       cfg.Site.Title,
+			"Title":       "首页",
 			"SiteTitle":   cfg.Site.Title,
 			"Description": cfg.Site.Description,
 			"Canonical":   seo.CanonicalURL(cfg.Site.BaseURL, c.Request.URL),
