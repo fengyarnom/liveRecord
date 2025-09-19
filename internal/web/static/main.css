@@ -1,6 +1,6 @@
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
-    min-height: 100%;
+    min-height: 100vh; /* ensure footer sticks to viewport bottom */
     display: flex;
     margin: 0;
     flex-direction: column;
@@ -502,3 +502,15 @@ article .post-back{
     margin-top: 2em;
 }
 
+/* Footer */
+.site-footer{ margin-top:auto; border-top:1px solid #eee; background:#fafafa; color:#667085; font-size:14px; padding:1.25em 25%; }
+.site-footer .footer-inner{ display:flex; align-items:center; justify-content:space-between; gap:8px 12px; flex-wrap:wrap; }
+.site-footer .footer-text{ margin:0; }
+.site-footer .footer-nav{ display:flex; align-items:center; gap:6px; }
+.site-footer .footer-nav a{ color:inherit; padding:4px 8px; border-radius:6px; text-decoration:none; }
+.site-footer .footer-nav a:hover{ background:#f4f4f4; }
+.site-footer .sep{ color:#98a2b3; }
+
+/* Footer responsive paddings */
+@media (max-width: 1024px){ .site-footer{ padding:1em 10%; } }
+@media (max-width: 768px){ .site-footer{ padding:1em 2em; } .site-footer .footer-inner{ justify-content:center; } }

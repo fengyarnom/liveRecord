@@ -4,15 +4,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ .SiteTitle }}</title>
+  <title>{{ if .Title }}{{ .Title }} - {{ .SiteTitle }}{{ else }}{{ .SiteTitle }}{{ end }}</title>
   <meta name="description" content="{{ .Description }}">
+  {{ if .NoIndex }}<meta name="robots" content="noindex, nofollow">{{ end }}
   {{ if .Canonical }}<link rel="canonical" href="{{ .Canonical }}">{{ end }}
+  <link rel="alternate" type="application/rss+xml" title="{{ .SiteTitle }} RSS" href="/feed.xml">
+  <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
   <meta property="og:title" content="{{ .Title }}">
   <meta property="og:description" content="{{ .Description }}">
+  <meta property="og:site_name" content="{{ .SiteTitle }}">
+  <meta property="og:type" content="{{ if .Post }}article{{ else }}website{{ end }}">
   {{ if .Canonical }}<meta property="og:url" content="{{ .Canonical }}">{{ end }}
   <meta name="twitter:card" content="summary">
+  <link rel="icon" href="/static/favicon.ico">
   <link rel="stylesheet" href="/static/normalize.css">
   <link rel="stylesheet" href="/static/main.css">
+  {{ if .Pager }}
+    {{ if .Pager.PrevURL }}<link rel="prev" href="{{ .Pager.PrevURL }}">{{ end }}
+    {{ if .Pager.NextURL }}<link rel="next" href="{{ .Pager.NextURL }}">{{ end }}
+  {{ end }}
 </head>
 <body>
   <header class="site-header">

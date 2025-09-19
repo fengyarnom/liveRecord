@@ -1,6 +1,15 @@
 {{ define "partials/footer" }}
   </main>
-  <footer class="site-footer">©</footer>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-text">© {{ .SiteTitle }}</p>
+      <nav class="footer-nav" aria-label="页脚导航">
+        <a href="/feed.xml" title="RSS 订阅">RSS</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href="/sitemap.xml" title="网站地图">Sitemap</a>
+      </nav>
+    </div>
+  </footer>
   <script src="/static/main.js" defer></script>
 </body>
 </html>
