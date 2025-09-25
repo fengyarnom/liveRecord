@@ -48,6 +48,11 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 	overlayEnv(&c)
+	// Normalize and validate site.base_url so generated links are absolute
+	c.Site.BaseURL = strings.TrimSpace(c.Site.BaseURL)
+	if c.Site.BaseURL == "" || !(strings.HasPrefix(strings.ToLower(c.Site.BaseURL), "http://") || strings.HasPrefix(strings.ToLower(c.Site.BaseURL), "https://")) {
+		return nil, errors.New("site.base_url must be an absolute URL with scheme, e.g., https://yarnom.com")
+	}
 	if c.Server.Port == "" {
 		c.Server.Port = "8080"
 	}
